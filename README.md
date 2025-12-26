@@ -1,4 +1,5 @@
 📊 Netflix Content Analysis & Insights
+
 📌 Project Description
 
 This project performs an end-to-end exploratory data analysis (EDA) on the Netflix dataset to uncover meaningful trends in content production, distribution, and classification.
