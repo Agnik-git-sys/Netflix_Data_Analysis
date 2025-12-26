@@ -1,0 +1,1135 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "6bf4238a",
+   "metadata": {
+    "papermill": {
+     "duration": 0.003747,
+     "end_time": "2025-12-26T20:20:36.749201",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:36.745454",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## Netflix Content Analysis 🎬"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "bce8a23a",
+   "metadata": {
+    "papermill": {
+     "duration": 0.002629,
+     "end_time": "2025-12-26T20:20:36.754699",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:36.752070",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "### Importing the required libaries with the dataset of netflix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "6342a7d2",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-26T20:20:36.761401Z",
+     "iopub.status.busy": "2025-12-26T20:20:36.761047Z",
+     "iopub.status.idle": "2025-12-26T20:20:40.095109Z",
+     "shell.execute_reply": "2025-12-26T20:20:40.094149Z"
+    },
+    "papermill": {
+     "duration": 3.339944,
+     "end_time": "2025-12-26T20:20:40.097232",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:36.757288",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "All the required lib are imported\n"
+     ]
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import seaborn as sns\n",
+    "\n",
+    "print(\"All the required lib are imported\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "6947fbc9",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-26T20:20:40.104998Z",
+     "iopub.status.busy": "2025-12-26T20:20:40.104534Z",
+     "iopub.status.idle": "2025-12-26T20:20:40.240634Z",
+     "shell.execute_reply": "2025-12-26T20:20:40.239695Z"
+    },
+    "papermill": {
+     "duration": 0.142203,
+     "end_time": "2025-12-26T20:20:40.242561",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.100358",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>show_id</th>\n",
+       "      <th>type</th>\n",
+       "      <th>title</th>\n",
+       "      <th>director</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>country</th>\n",
+       "      <th>date_added</th>\n",
+       "      <th>release_year</th>\n",
+       "      <th>rating</th>\n",
+       "      <th>duration</th>\n",
+       "      <th>listed_in</th>\n",
+       "      <th>description</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>s1</td>\n",
+       "      <td>TV Show</td>\n",
+       "      <td>3%</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>João Miguel, Bianca Comparato, Michel Gomes, R...</td>\n",
+       "      <td>Brazil</td>\n",
+       "      <td>August 14, 2020</td>\n",
+       "      <td>2020</td>\n",
+       "      <td>TV-MA</td>\n",
+       "      <td>4 Seasons</td>\n",
+       "      <td>International TV Shows, TV Dramas, TV Sci-Fi &amp;...</td>\n",
+       "      <td>In a future where the elite inhabit an island ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>s2</td>\n",
+       "      <td>Movie</td>\n",
+       "      <td>7:19</td>\n",
+       "      <td>Jorge Michel Grau</td>\n",
+       "      <td>Demián Bichir, Héctor Bonilla, Oscar Serrano, ...</td>\n",
+       "      <td>Mexico</td>\n",
+       "      <td>December 23, 2016</td>\n",
+       "      <td>2016</td>\n",
+       "      <td>TV-MA</td>\n",
+       "      <td>93 min</td>\n",
+       "      <td>Dramas, International Movies</td>\n",
+       "      <td>After a devastating earthquake hits Mexico Cit...</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "  show_id     type title           director  \\\n",
+       "0      s1  TV Show    3%                NaN   \n",
+       "1      s2    Movie  7:19  Jorge Michel Grau   \n",
+       "\n",
+       "                                                cast country  \\\n",
+       "0  João Miguel, Bianca Comparato, Michel Gomes, R...  Brazil   \n",
+       "1  Demián Bichir, Héctor Bonilla, Oscar Serrano, ...  Mexico   \n",
+       "\n",
+       "          date_added  release_year rating   duration  \\\n",
+       "0    August 14, 2020          2020  TV-MA  4 Seasons   \n",
+       "1  December 23, 2016          2016  TV-MA     93 min   \n",
+       "\n",
+       "                                           listed_in  \\\n",
+       "0  International TV Shows, TV Dramas, TV Sci-Fi &...   \n",
+       "1                       Dramas, International Movies   \n",
+       "\n",
+       "                                         description  \n",
+       "0  In a future where the elite inhabit an island ...  \n",
+       "1  After a devastating earthquake hits Mexico Cit...  "
+      ]
+     },
+     "execution_count": 2,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df = pd.read_csv(\"/kaggle/input/netflix-csv/netflix_titles.csv\") #importing the DataFrame\n",
+    "# pd.reset_option(\"display.max_row\",None)\n",
+    "# pd.set_option(\"display.max_columns\",None)\n",
+    "df.head(2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "6ffc8d51",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-26T20:20:40.250959Z",
+     "iopub.status.busy": "2025-12-26T20:20:40.250100Z",
+     "iopub.status.idle": "2025-12-26T20:20:40.278352Z",
+     "shell.execute_reply": "2025-12-26T20:20:40.277328Z"
+    },
+    "papermill": {
+     "duration": 0.034522,
+     "end_time": "2025-12-26T20:20:40.280299",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.245777",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "RangeIndex: 7787 entries, 0 to 7786\n",
+      "Data columns (total 12 columns):\n",
+      " #   Column        Non-Null Count  Dtype \n",
+      "---  ------        --------------  ----- \n",
+      " 0   show_id       7787 non-null   object\n",
+      " 1   type          7787 non-null   object\n",
+      " 2   title         7787 non-null   object\n",
+      " 3   director      5398 non-null   object\n",
+      " 4   cast          7069 non-null   object\n",
+      " 5   country       7280 non-null   object\n",
+      " 6   date_added    7777 non-null   object\n",
+      " 7   release_year  7787 non-null   int64 \n",
+      " 8   rating        7780 non-null   object\n",
+      " 9   duration      7787 non-null   object\n",
+      " 10  listed_in     7787 non-null   object\n",
+      " 11  description   7787 non-null   object\n",
+      "dtypes: int64(1), object(11)\n",
+      "memory usage: 730.2+ KB\n"
+     ]
+    }
+   ],
+   "source": [
+    "df.info() #checking the structure of the dataframe"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "502d0ca0",
+   "metadata": {
+    "papermill": {
+     "duration": 0.003114,
+     "end_time": "2025-12-26T20:20:40.286617",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.283503",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## Interpretation of the above cell\n",
+    "- Date column is in object(string) Dtype, need to be in datetime object\n",
+    "- missing values in director, cast, country, date_added, rating column"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "8bcb25f1",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-26T20:20:40.294431Z",
+     "iopub.status.busy": "2025-12-26T20:20:40.294101Z",
+     "iopub.status.idle": "2025-12-26T20:20:40.306589Z",
+     "shell.execute_reply": "2025-12-26T20:20:40.305705Z"
+    },
+    "papermill": {
+     "duration": 0.018638,
+     "end_time": "2025-12-26T20:20:40.308292",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.289654",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "show_id            0\n",
+       "type               0\n",
+       "title              0\n",
+       "director        2389\n",
+       "cast             718\n",
+       "country          507\n",
+       "date_added        10\n",
+       "release_year       0\n",
+       "rating             7\n",
+       "duration           0\n",
+       "listed_in          0\n",
+       "description        0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.isnull().sum() #checking for the missing values in dataframe"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b11eed1d",
+   "metadata": {
+    "papermill": {
+     "duration": 0.003276,
+     "end_time": "2025-12-26T20:20:40.314804",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.311528",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## We can see the here the missing data from each column\n",
+    "- Necessary actions will be taken place regarding the missing data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "ef11ec99",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-26T20:20:40.322796Z",
+     "iopub.status.busy": "2025-12-26T20:20:40.322175Z",
+     "iopub.status.idle": "2025-12-26T20:20:40.331724Z",
+     "shell.execute_reply": "2025-12-26T20:20:40.330875Z"
+    },
+    "papermill": {
+     "duration": 0.015442,
+     "end_time": "2025-12-26T20:20:40.333370",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.317928",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Director Column data:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>index</th>\n",
+       "      <th>director</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1</td>\n",
+       "      <td>Jorge Michel Grau</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2</td>\n",
+       "      <td>Gilbert Chan</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>3</td>\n",
+       "      <td>Shane Acker</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>4</td>\n",
+       "      <td>Robert Luketic</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   index           director\n",
+       "0      0                NaN\n",
+       "1      1  Jorge Michel Grau\n",
+       "2      2       Gilbert Chan\n",
+       "3      3        Shane Acker\n",
+       "4      4     Robert Luketic"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Director Column data:\")\n",
+    "df['director'].head(5).reset_index()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "841de451",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-26T20:20:40.341323Z",
+     "iopub.status.busy": "2025-12-26T20:20:40.341023Z",
+     "iopub.status.idle": "2025-12-26T20:20:40.349851Z",
+     "shell.execute_reply": "2025-12-26T20:20:40.348860Z"
+    },
+    "papermill": {
+     "duration": 0.014889,
+     "end_time": "2025-12-26T20:20:40.351502",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.336613",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Cast Column data:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>index</th>\n",
+       "      <th>cast</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>João Miguel, Bianca Comparato, Michel Gomes, R...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1</td>\n",
+       "      <td>Demián Bichir, Héctor Bonilla, Oscar Serrano, ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2</td>\n",
+       "      <td>Tedd Chan, Stella Chung, Henley Hii, Lawrence ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>3</td>\n",
+       "      <td>Elijah Wood, John C. Reilly, Jennifer Connelly...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>4</td>\n",
+       "      <td>Jim Sturgess, Kevin Spacey, Kate Bosworth, Aar...</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   index                                               cast\n",
+       "0      0  João Miguel, Bianca Comparato, Michel Gomes, R...\n",
+       "1      1  Demián Bichir, Héctor Bonilla, Oscar Serrano, ...\n",
+       "2      2  Tedd Chan, Stella Chung, Henley Hii, Lawrence ...\n",
+       "3      3  Elijah Wood, John C. Reilly, Jennifer Connelly...\n",
+       "4      4  Jim Sturgess, Kevin Spacey, Kate Bosworth, Aar..."
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Cast Column data:\")\n",
+    "df['cast'].head(5).reset_index()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "839a7626",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-26T20:20:40.360315Z",
+     "iopub.status.busy": "2025-12-26T20:20:40.359580Z",
+     "iopub.status.idle": "2025-12-26T20:20:40.368583Z",
+     "shell.execute_reply": "2025-12-26T20:20:40.367679Z"
+    },
+    "papermill": {
+     "duration": 0.015127,
+     "end_time": "2025-12-26T20:20:40.370193",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.355066",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Country Column data:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>index</th>\n",
+       "      <th>country</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>Brazil</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1</td>\n",
+       "      <td>Mexico</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2</td>\n",
+       "      <td>Singapore</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>3</td>\n",
+       "      <td>United States</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>4</td>\n",
+       "      <td>United States</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   index        country\n",
+       "0      0         Brazil\n",
+       "1      1         Mexico\n",
+       "2      2      Singapore\n",
+       "3      3  United States\n",
+       "4      4  United States"
+      ]
+     },
+     "execution_count": 7,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Country Column data:\")\n",
+    "df['country'].head(5).reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "9eceb073",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-26T20:20:40.379496Z",
+     "iopub.status.busy": "2025-12-26T20:20:40.379067Z",
+     "iopub.status.idle": "2025-12-26T20:20:40.387242Z",
+     "shell.execute_reply": "2025-12-26T20:20:40.386320Z"
+    },
+    "papermill": {
+     "duration": 0.014924,
+     "end_time": "2025-12-26T20:20:40.388962",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.374038",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Missing data country :\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "0       False\n",
+       "1       False\n",
+       "2       False\n",
+       "3       False\n",
+       "4       False\n",
+       "        ...  \n",
+       "7782    False\n",
+       "7783    False\n",
+       "7784     True\n",
+       "7785    False\n",
+       "7786    False\n",
+       "Name: country, Length: 7787, dtype: bool"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Missing data country :\")\n",
+    "df['country'].isnull()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "ea19225d",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-26T20:20:40.398212Z",
+     "iopub.status.busy": "2025-12-26T20:20:40.397892Z",
+     "iopub.status.idle": "2025-12-26T20:20:40.406942Z",
+     "shell.execute_reply": "2025-12-26T20:20:40.406057Z"
+    },
+    "papermill": {
+     "duration": 0.015761,
+     "end_time": "2025-12-26T20:20:40.408606",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.392845",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Date Column data:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>index</th>\n",
+       "      <th>date_added</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>August 14, 2020</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1</td>\n",
+       "      <td>December 23, 2016</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2</td>\n",
+       "      <td>December 20, 2018</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>3</td>\n",
+       "      <td>November 16, 2017</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>4</td>\n",
+       "      <td>January 1, 2020</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   index         date_added\n",
+       "0      0    August 14, 2020\n",
+       "1      1  December 23, 2016\n",
+       "2      2  December 20, 2018\n",
+       "3      3  November 16, 2017\n",
+       "4      4    January 1, 2020"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Date Column data:\")\n",
+    "df['date_added'].head(5).reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "d9060a94",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-26T20:20:40.418347Z",
+     "iopub.status.busy": "2025-12-26T20:20:40.417979Z",
+     "iopub.status.idle": "2025-12-26T20:20:40.432321Z",
+     "shell.execute_reply": "2025-12-26T20:20:40.431220Z"
+    },
+    "papermill": {
+     "duration": 0.021594,
+     "end_time": "2025-12-26T20:20:40.434278",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.412684",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Missing data in Date:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>date_added</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>False</td>\n",
+       "      <td>7777</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>True</td>\n",
+       "      <td>10</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   date_added  count\n",
+       "0       False   7777\n",
+       "1        True     10"
+      ]
+     },
+     "execution_count": 10,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Missing data in Date:\")\n",
+    "df['date_added'].isnull().value_counts().reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "a270eadc",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-26T20:20:40.444663Z",
+     "iopub.status.busy": "2025-12-26T20:20:40.444070Z",
+     "iopub.status.idle": "2025-12-26T20:20:40.453110Z",
+     "shell.execute_reply": "2025-12-26T20:20:40.452346Z"
+    },
+    "papermill": {
+     "duration": 0.016117,
+     "end_time": "2025-12-26T20:20:40.454858",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.438741",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Rating Column data:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>index</th>\n",
+       "      <th>rating</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>TV-MA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1</td>\n",
+       "      <td>TV-MA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2</td>\n",
+       "      <td>R</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>3</td>\n",
+       "      <td>PG-13</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>4</td>\n",
+       "      <td>PG-13</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   index rating\n",
+       "0      0  TV-MA\n",
+       "1      1  TV-MA\n",
+       "2      2      R\n",
+       "3      3  PG-13\n",
+       "4      4  PG-13"
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Rating Column data:\")\n",
+    "df['rating'].head(5).reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "6244a967",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-26T20:20:40.464610Z",
+     "iopub.status.busy": "2025-12-26T20:20:40.464319Z",
+     "iopub.status.idle": "2025-12-26T20:20:40.473722Z",
+     "shell.execute_reply": "2025-12-26T20:20:40.472744Z"
+    },
+    "papermill": {
+     "duration": 0.016433,
+     "end_time": "2025-12-26T20:20:40.475614",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.459181",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Missing data in rating:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>rating</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>False</td>\n",
+       "      <td>7780</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>True</td>\n",
+       "      <td>7</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   rating  count\n",
+       "0   False   7780\n",
+       "1    True      7"
+      ]
+     },
+     "execution_count": 12,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Missing data in rating:\")\n",
+    "df['rating'].isnull().value_counts().reset_index()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d9a6bad0",
+   "metadata": {
+    "papermill": {
+     "duration": 0.004263,
+     "end_time": "2025-12-26T20:20:40.484994",
+     "exception": false,
+     "start_time": "2025-12-26T20:20:40.480731",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kaggle": {
+   "accelerator": "none",
+   "dataSources": [
+    {
+     "datasetId": 9128536,
+     "sourceId": 14300188,
+     "sourceType": "datasetVersion"
+    }
+   ],
+   "dockerImageVersionId": 31234,
+   "isGpuEnabled": false,
+   "isInternetEnabled": true,
+   "language": "python",
+   "sourceType": "notebook"
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.12"
+  },
+  "papermill": {
+   "default_parameters": {},
+   "duration": 7.693444,
+   "end_time": "2025-12-26T20:20:41.108687",
+   "environment_variables": {},
+   "exception": null,
+   "input_path": "__notebook__.ipynb",
+   "output_path": "__notebook__.ipynb",
+   "parameters": {},
+   "start_time": "2025-12-26T20:20:33.415243",
+   "version": "2.6.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
