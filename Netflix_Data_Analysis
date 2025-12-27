@@ -1,1 +1,2586 @@
-{"metadata":{"kernelspec":{"language":"python","display_name":"Python 3","name":"python3"},"language_info":{"name":"python","version":"3.12.12","mimetype":"text/x-python","codemirror_mode":{"name":"ipython","version":3},"pygments_lexer":"ipython3","nbconvert_exporter":"python","file_extension":".py"},"kaggle":{"accelerator":"none","dataSources":[{"sourceId":14300188,"sourceType":"datasetVersion","datasetId":9128536}],"dockerImageVersionId":31234,"isInternetEnabled":true,"language":"python","sourceType":"notebook","isGpuEnabled":false}},"nbformat_minor":4,"nbformat":4,"cells":[{"cell_type":"markdown","source":"## Netflix Content Analysis 🎬","metadata":{}},{"cell_type":"markdown","source":"### Importing the required libaries with the dataset of netflix","metadata":{}},{"cell_type":"code","source":"import pandas as pd\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\nprint(\"All the required lib are imported\")","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:24.741374Z","iopub.execute_input":"2025-12-27T19:45:24.741727Z","iopub.status.idle":"2025-12-27T19:45:26.252657Z","shell.execute_reply.started":"2025-12-27T19:45:24.741696Z","shell.execute_reply":"2025-12-27T19:45:26.251471Z"}},"outputs":[{"name":"stdout","text":"All the required lib are imported\n","output_type":"stream"}],"execution_count":1},{"cell_type":"code","source":"df = pd.read_csv(\"/kaggle/input/netflix-csv/netflix_titles.csv\") #importing the DataFrame\n# pd.reset_option(\"display.max_row\",None)\n# pd.set_option(\"display.max_columns\",None)\ndf.head(2)","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.254263Z","iopub.execute_input":"2025-12-27T19:45:26.254717Z","iopub.status.idle":"2025-12-27T19:45:26.397930Z","shell.execute_reply.started":"2025-12-27T19:45:26.254683Z","shell.execute_reply":"2025-12-27T19:45:26.397086Z"}},"outputs":[{"execution_count":2,"output_type":"execute_result","data":{"text/plain":"  show_id     type title           director  \\\n0      s1  TV Show    3%                NaN   \n1      s2    Movie  7:19  Jorge Michel Grau   \n\n                                                cast country  \\\n0  João Miguel, Bianca Comparato, Michel Gomes, R...  Brazil   \n1  Demián Bichir, Héctor Bonilla, Oscar Serrano, ...  Mexico   \n\n          date_added  release_year rating   duration  \\\n0    August 14, 2020          2020  TV-MA  4 Seasons   \n1  December 23, 2016          2016  TV-MA     93 min   \n\n                                           listed_in  \\\n0  International TV Shows, TV Dramas, TV Sci-Fi &...   \n1                       Dramas, International Movies   \n\n                                         description  \n0  In a future where the elite inhabit an island ...  \n1  After a devastating earthquake hits Mexico Cit...  ","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>show_id</th>\n      <th>type</th>\n      <th>title</th>\n      <th>director</th>\n      <th>cast</th>\n      <th>country</th>\n      <th>date_added</th>\n      <th>release_year</th>\n      <th>rating</th>\n      <th>duration</th>\n      <th>listed_in</th>\n      <th>description</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>s1</td>\n      <td>TV Show</td>\n      <td>3%</td>\n      <td>NaN</td>\n      <td>João Miguel, Bianca Comparato, Michel Gomes, R...</td>\n      <td>Brazil</td>\n      <td>August 14, 2020</td>\n      <td>2020</td>\n      <td>TV-MA</td>\n      <td>4 Seasons</td>\n      <td>International TV Shows, TV Dramas, TV Sci-Fi &amp;...</td>\n      <td>In a future where the elite inhabit an island ...</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>s2</td>\n      <td>Movie</td>\n      <td>7:19</td>\n      <td>Jorge Michel Grau</td>\n      <td>Demián Bichir, Héctor Bonilla, Oscar Serrano, ...</td>\n      <td>Mexico</td>\n      <td>December 23, 2016</td>\n      <td>2016</td>\n      <td>TV-MA</td>\n      <td>93 min</td>\n      <td>Dramas, International Movies</td>\n      <td>After a devastating earthquake hits Mexico Cit...</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":2},{"cell_type":"code","source":"df.info() #checking the structure of the dataframe","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.398974Z","iopub.execute_input":"2025-12-27T19:45:26.399301Z","iopub.status.idle":"2025-12-27T19:45:26.428887Z","shell.execute_reply.started":"2025-12-27T19:45:26.399247Z","shell.execute_reply":"2025-12-27T19:45:26.427722Z"}},"outputs":[{"name":"stdout","text":"<class 'pandas.core.frame.DataFrame'>\nRangeIndex: 7787 entries, 0 to 7786\nData columns (total 12 columns):\n #   Column        Non-Null Count  Dtype \n---  ------        --------------  ----- \n 0   show_id       7787 non-null   object\n 1   type          7787 non-null   object\n 2   title         7787 non-null   object\n 3   director      5398 non-null   object\n 4   cast          7069 non-null   object\n 5   country       7280 non-null   object\n 6   date_added    7777 non-null   object\n 7   release_year  7787 non-null   int64 \n 8   rating        7780 non-null   object\n 9   duration      7787 non-null   object\n 10  listed_in     7787 non-null   object\n 11  description   7787 non-null   object\ndtypes: int64(1), object(11)\nmemory usage: 730.2+ KB\n","output_type":"stream"}],"execution_count":3},{"cell_type":"markdown","source":"## Interpretation of the above cell\n- Date column is in object(string) Dtype, need to be in datetime object\n- missing values in director, cast, country, date_added, rating column","metadata":{}},{"cell_type":"code","source":"df.isnull().sum() #checking for the missing values in dataframe","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.431431Z","iopub.execute_input":"2025-12-27T19:45:26.431715Z","iopub.status.idle":"2025-12-27T19:45:26.447156Z","shell.execute_reply.started":"2025-12-27T19:45:26.431688Z","shell.execute_reply":"2025-12-27T19:45:26.446253Z"}},"outputs":[{"execution_count":4,"output_type":"execute_result","data":{"text/plain":"show_id            0\ntype               0\ntitle              0\ndirector        2389\ncast             718\ncountry          507\ndate_added        10\nrelease_year       0\nrating             7\nduration           0\nlisted_in          0\ndescription        0\ndtype: int64"},"metadata":{}}],"execution_count":4},{"cell_type":"markdown","source":"## We can see the here the missing data from each column\n- Necessary actions will be taken place regarding the missing data","metadata":{}},{"cell_type":"code","source":"print(\"Director Column data:\")\ndf['director'].head(5).reset_index()\n","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.448538Z","iopub.execute_input":"2025-12-27T19:45:26.449013Z","iopub.status.idle":"2025-12-27T19:45:26.470057Z","shell.execute_reply.started":"2025-12-27T19:45:26.448972Z","shell.execute_reply":"2025-12-27T19:45:26.469159Z"}},"outputs":[{"name":"stdout","text":"Director Column data:\n","output_type":"stream"},{"execution_count":5,"output_type":"execute_result","data":{"text/plain":"   index           director\n0      0                NaN\n1      1  Jorge Michel Grau\n2      2       Gilbert Chan\n3      3        Shane Acker\n4      4     Robert Luketic","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>index</th>\n      <th>director</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>0</td>\n      <td>NaN</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>1</td>\n      <td>Jorge Michel Grau</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>2</td>\n      <td>Gilbert Chan</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>3</td>\n      <td>Shane Acker</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>4</td>\n      <td>Robert Luketic</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":5},{"cell_type":"code","source":"print(\"Missing data Director :\")\ndf['director'].isnull().value_counts().reset_index()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.471547Z","iopub.execute_input":"2025-12-27T19:45:26.471887Z","iopub.status.idle":"2025-12-27T19:45:26.498611Z","shell.execute_reply.started":"2025-12-27T19:45:26.471858Z","shell.execute_reply":"2025-12-27T19:45:26.497600Z"}},"outputs":[{"name":"stdout","text":"Missing data Director :\n","output_type":"stream"},{"execution_count":6,"output_type":"execute_result","data":{"text/plain":"   director  count\n0     False   5398\n1      True   2389","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>director</th>\n      <th>count</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>False</td>\n      <td>5398</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>True</td>\n      <td>2389</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":6},{"cell_type":"code","source":"print(\"Cast Column data:\")\ndf['cast'].head(5).reset_index()\n","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.499653Z","iopub.execute_input":"2025-12-27T19:45:26.499930Z","iopub.status.idle":"2025-12-27T19:45:26.521957Z","shell.execute_reply.started":"2025-12-27T19:45:26.499904Z","shell.execute_reply":"2025-12-27T19:45:26.520887Z"}},"outputs":[{"name":"stdout","text":"Cast Column data:\n","output_type":"stream"},{"execution_count":7,"output_type":"execute_result","data":{"text/plain":"   index                                               cast\n0      0  João Miguel, Bianca Comparato, Michel Gomes, R...\n1      1  Demián Bichir, Héctor Bonilla, Oscar Serrano, ...\n2      2  Tedd Chan, Stella Chung, Henley Hii, Lawrence ...\n3      3  Elijah Wood, John C. Reilly, Jennifer Connelly...\n4      4  Jim Sturgess, Kevin Spacey, Kate Bosworth, Aar...","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>index</th>\n      <th>cast</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>0</td>\n      <td>João Miguel, Bianca Comparato, Michel Gomes, R...</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>1</td>\n      <td>Demián Bichir, Héctor Bonilla, Oscar Serrano, ...</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>2</td>\n      <td>Tedd Chan, Stella Chung, Henley Hii, Lawrence ...</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>3</td>\n      <td>Elijah Wood, John C. Reilly, Jennifer Connelly...</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>4</td>\n      <td>Jim Sturgess, Kevin Spacey, Kate Bosworth, Aar...</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":7},{"cell_type":"code","source":"print(\"Missing data Cast :\")\ndf['cast'].isnull().value_counts().reset_index()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.523257Z","iopub.execute_input":"2025-12-27T19:45:26.523615Z","iopub.status.idle":"2025-12-27T19:45:26.547250Z","shell.execute_reply.started":"2025-12-27T19:45:26.523586Z","shell.execute_reply":"2025-12-27T19:45:26.546231Z"}},"outputs":[{"name":"stdout","text":"Missing data Cast :\n","output_type":"stream"},{"execution_count":8,"output_type":"execute_result","data":{"text/plain":"    cast  count\n0  False   7069\n1   True    718","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>cast</th>\n      <th>count</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>False</td>\n      <td>7069</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>True</td>\n      <td>718</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":8},{"cell_type":"code","source":"print(\"Country Column data:\")\ndf['country'].head(5).reset_index()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.548420Z","iopub.execute_input":"2025-12-27T19:45:26.548729Z","iopub.status.idle":"2025-12-27T19:45:26.569774Z","shell.execute_reply.started":"2025-12-27T19:45:26.548703Z","shell.execute_reply":"2025-12-27T19:45:26.568892Z"}},"outputs":[{"name":"stdout","text":"Country Column data:\n","output_type":"stream"},{"execution_count":9,"output_type":"execute_result","data":{"text/plain":"   index        country\n0      0         Brazil\n1      1         Mexico\n2      2      Singapore\n3      3  United States\n4      4  United States","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>index</th>\n      <th>country</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>0</td>\n      <td>Brazil</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>1</td>\n      <td>Mexico</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>2</td>\n      <td>Singapore</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>3</td>\n      <td>United States</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>4</td>\n      <td>United States</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":9},{"cell_type":"code","source":"print(\"Missing data country :\")\ndf['country'].isnull().value_counts().reset_index()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.572584Z","iopub.execute_input":"2025-12-27T19:45:26.572900Z","iopub.status.idle":"2025-12-27T19:45:26.594569Z","shell.execute_reply.started":"2025-12-27T19:45:26.572872Z","shell.execute_reply":"2025-12-27T19:45:26.593472Z"}},"outputs":[{"name":"stdout","text":"Missing data country :\n","output_type":"stream"},{"execution_count":10,"output_type":"execute_result","data":{"text/plain":"   country  count\n0    False   7280\n1     True    507","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>country</th>\n      <th>count</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>False</td>\n      <td>7280</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>True</td>\n      <td>507</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":10},{"cell_type":"code","source":"print(\"Date Column data:\")\ndf['date_added'].head(5).reset_index()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.595995Z","iopub.execute_input":"2025-12-27T19:45:26.596561Z","iopub.status.idle":"2025-12-27T19:45:26.623871Z","shell.execute_reply.started":"2025-12-27T19:45:26.596500Z","shell.execute_reply":"2025-12-27T19:45:26.622711Z"}},"outputs":[{"name":"stdout","text":"Date Column data:\n","output_type":"stream"},{"execution_count":11,"output_type":"execute_result","data":{"text/plain":"   index         date_added\n0      0    August 14, 2020\n1      1  December 23, 2016\n2      2  December 20, 2018\n3      3  November 16, 2017\n4      4    January 1, 2020","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>index</th>\n      <th>date_added</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>0</td>\n      <td>August 14, 2020</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>1</td>\n      <td>December 23, 2016</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>2</td>\n      <td>December 20, 2018</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>3</td>\n      <td>November 16, 2017</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>4</td>\n      <td>January 1, 2020</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":11},{"cell_type":"code","source":"print(\"Missing data in Date:\")\ndf['date_added'].isnull().value_counts().reset_index()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.624961Z","iopub.execute_input":"2025-12-27T19:45:26.625253Z","iopub.status.idle":"2025-12-27T19:45:26.649801Z","shell.execute_reply.started":"2025-12-27T19:45:26.625223Z","shell.execute_reply":"2025-12-27T19:45:26.648668Z"}},"outputs":[{"name":"stdout","text":"Missing data in Date:\n","output_type":"stream"},{"execution_count":12,"output_type":"execute_result","data":{"text/plain":"   date_added  count\n0       False   7777\n1        True     10","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>date_added</th>\n      <th>count</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>False</td>\n      <td>7777</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>True</td>\n      <td>10</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":12},{"cell_type":"code","source":"print(\"Rating Column data:\")\ndf['rating'].head(5).reset_index()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.651163Z","iopub.execute_input":"2025-12-27T19:45:26.651562Z","iopub.status.idle":"2025-12-27T19:45:26.672809Z","shell.execute_reply.started":"2025-12-27T19:45:26.651529Z","shell.execute_reply":"2025-12-27T19:45:26.671747Z"}},"outputs":[{"name":"stdout","text":"Rating Column data:\n","output_type":"stream"},{"execution_count":13,"output_type":"execute_result","data":{"text/plain":"   index rating\n0      0  TV-MA\n1      1  TV-MA\n2      2      R\n3      3  PG-13\n4      4  PG-13","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>index</th>\n      <th>rating</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>0</td>\n      <td>TV-MA</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>1</td>\n      <td>TV-MA</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>2</td>\n      <td>R</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>3</td>\n      <td>PG-13</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>4</td>\n      <td>PG-13</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":13},{"cell_type":"code","source":"print(\"Missing data in rating:\")\ndf['rating'].isnull().value_counts().reset_index()\n","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.673934Z","iopub.execute_input":"2025-12-27T19:45:26.674248Z","iopub.status.idle":"2025-12-27T19:45:26.695263Z","shell.execute_reply.started":"2025-12-27T19:45:26.674220Z","shell.execute_reply":"2025-12-27T19:45:26.694321Z"}},"outputs":[{"name":"stdout","text":"Missing data in rating:\n","output_type":"stream"},{"execution_count":14,"output_type":"execute_result","data":{"text/plain":"   rating  count\n0   False   7780\n1    True      7","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>rating</th>\n      <th>count</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>False</td>\n      <td>7780</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>True</td>\n      <td>7</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":14},{"cell_type":"markdown","source":"## Cleaning and Transforming the data\n- cast and director nan values will be changed to empty\n- changing the Dtype of date to datetime\n- mode the country, most frequent one\n- droping few rows from rating and date as there is very little data is missing","metadata":{}},{"cell_type":"markdown","source":"### Changing the Director NaN values","metadata":{}},{"cell_type":"code","source":"df['director'] = df['director'].fillna(\"Unknown\")\ndf.head(2)","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.696844Z","iopub.execute_input":"2025-12-27T19:45:26.697785Z","iopub.status.idle":"2025-12-27T19:45:26.722798Z","shell.execute_reply.started":"2025-12-27T19:45:26.697746Z","shell.execute_reply":"2025-12-27T19:45:26.721718Z"}},"outputs":[{"execution_count":15,"output_type":"execute_result","data":{"text/plain":"  show_id     type title           director  \\\n0      s1  TV Show    3%            Unknown   \n1      s2    Movie  7:19  Jorge Michel Grau   \n\n                                                cast country  \\\n0  João Miguel, Bianca Comparato, Michel Gomes, R...  Brazil   \n1  Demián Bichir, Héctor Bonilla, Oscar Serrano, ...  Mexico   \n\n          date_added  release_year rating   duration  \\\n0    August 14, 2020          2020  TV-MA  4 Seasons   \n1  December 23, 2016          2016  TV-MA     93 min   \n\n                                           listed_in  \\\n0  International TV Shows, TV Dramas, TV Sci-Fi &...   \n1                       Dramas, International Movies   \n\n                                         description  \n0  In a future where the elite inhabit an island ...  \n1  After a devastating earthquake hits Mexico Cit...  ","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>show_id</th>\n      <th>type</th>\n      <th>title</th>\n      <th>director</th>\n      <th>cast</th>\n      <th>country</th>\n      <th>date_added</th>\n      <th>release_year</th>\n      <th>rating</th>\n      <th>duration</th>\n      <th>listed_in</th>\n      <th>description</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>s1</td>\n      <td>TV Show</td>\n      <td>3%</td>\n      <td>Unknown</td>\n      <td>João Miguel, Bianca Comparato, Michel Gomes, R...</td>\n      <td>Brazil</td>\n      <td>August 14, 2020</td>\n      <td>2020</td>\n      <td>TV-MA</td>\n      <td>4 Seasons</td>\n      <td>International TV Shows, TV Dramas, TV Sci-Fi &amp;...</td>\n      <td>In a future where the elite inhabit an island ...</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>s2</td>\n      <td>Movie</td>\n      <td>7:19</td>\n      <td>Jorge Michel Grau</td>\n      <td>Demián Bichir, Héctor Bonilla, Oscar Serrano, ...</td>\n      <td>Mexico</td>\n      <td>December 23, 2016</td>\n      <td>2016</td>\n      <td>TV-MA</td>\n      <td>93 min</td>\n      <td>Dramas, International Movies</td>\n      <td>After a devastating earthquake hits Mexico Cit...</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":15},{"cell_type":"code","source":"df[\"director\"].str.contains(\"Unknown\").value_counts().reset_index()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.724404Z","iopub.execute_input":"2025-12-27T19:45:26.724914Z","iopub.status.idle":"2025-12-27T19:45:26.748689Z","shell.execute_reply.started":"2025-12-27T19:45:26.724871Z","shell.execute_reply":"2025-12-27T19:45:26.747776Z"}},"outputs":[{"execution_count":16,"output_type":"execute_result","data":{"text/plain":"   director  count\n0     False   5398\n1      True   2389","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>director</th>\n      <th>count</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>False</td>\n      <td>5398</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>True</td>\n      <td>2389</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":16},{"cell_type":"markdown","source":"### Changing the Cast NaN values","metadata":{}},{"cell_type":"code","source":"df['cast'] = df['cast'].fillna(\"Unknown\")\ndf.loc[df['cast'] == 'Unknown','cast'].value_counts().reset_index()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.750097Z","iopub.execute_input":"2025-12-27T19:45:26.750476Z","iopub.status.idle":"2025-12-27T19:45:26.775504Z","shell.execute_reply.started":"2025-12-27T19:45:26.750444Z","shell.execute_reply":"2025-12-27T19:45:26.774424Z"}},"outputs":[{"execution_count":17,"output_type":"execute_result","data":{"text/plain":"      cast  count\n0  Unknown    718","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>cast</th>\n      <th>count</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>Unknown</td>\n      <td>718</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":17},{"cell_type":"code","source":"df.isna().sum()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:45:26.776551Z","iopub.execute_input":"2025-12-27T19:45:26.776845Z","iopub.status.idle":"2025-12-27T19:45:26.796656Z","shell.execute_reply.started":"2025-12-27T19:45:26.776819Z","shell.execute_reply":"2025-12-27T19:45:26.795652Z"}},"outputs":[{"execution_count":18,"output_type":"execute_result","data":{"text/plain":"show_id           0\ntype              0\ntitle             0\ndirector          0\ncast              0\ncountry         507\ndate_added       10\nrelease_year      0\nrating            7\nduration          0\nlisted_in         0\ndescription       0\ndtype: int64"},"metadata":{}}],"execution_count":18},{"cell_type":"markdown","source":"## Filling out the missing country data\n- using mode for the most frequent country and changing it ","metadata":{}},{"cell_type":"code","source":"df[\"country\"].isnull().value_counts().reset_index().rename({0: 'Missing country',1:\"country not missing\"})","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T19:49:41.811633Z","iopub.execute_input":"2025-12-27T19:49:41.811983Z","iopub.status.idle":"2025-12-27T19:49:41.823639Z","shell.execute_reply.started":"2025-12-27T19:49:41.811952Z","shell.execute_reply":"2025-12-27T19:49:41.822615Z"}},"outputs":[{"execution_count":24,"output_type":"execute_result","data":{"text/plain":"                     country  count\nMissing country        False   7280\ncountry not missing     True    507","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>country</th>\n      <th>count</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>Missing country</th>\n      <td>False</td>\n      <td>7280</td>\n    </tr>\n    <tr>\n      <th>country not missing</th>\n      <td>True</td>\n      <td>507</td>\n    </tr>\n  </tbody>\n</table>\n</div>"},"metadata":{}}],"execution_count":24},{"cell_type":"code","source":"df['country'].value_counts().reset_index()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T20:05:18.537179Z","iopub.execute_input":"2025-12-27T20:05:18.537583Z","iopub.status.idle":"2025-12-27T20:05:18.550537Z","shell.execute_reply.started":"2025-12-27T20:05:18.537550Z","shell.execute_reply":"2025-12-27T20:05:18.549622Z"}},"outputs":[{"execution_count":27,"output_type":"execute_result","data":{"text/plain":"                                            country  count\n0                                     United States   2555\n1                                             India    923\n2                                    United Kingdom    397\n3                                             Japan    226\n4                                       South Korea    183\n..                                              ...    ...\n676  Germany, United States, United Kingdom, Canada      1\n677             Peru, United States, United Kingdom      1\n678              Saudi Arabia, United Arab Emirates      1\n679  United Kingdom, France, United States, Belgium      1\n680                France, Norway, Lebanon, Belgium      1\n\n[681 rows x 2 columns]","text/html":"<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>country</th>\n      <th>count</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>United States</td>\n      <td>2555</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>India</td>\n      <td>923</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>United Kingdom</td>\n      <td>397</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>Japan</td>\n      <td>226</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>South Korea</td>\n      <td>183</td>\n    </tr>\n    <tr>\n      <th>...</th>\n      <td>...</td>\n      <td>...</td>\n    </tr>\n    <tr>\n      <th>676</th>\n      <td>Germany, United States, United Kingdom, Canada</td>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>677</th>\n      <td>Peru, United States, United Kingdom</td>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>678</th>\n      <td>Saudi Arabia, United Arab Emirates</td>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>679</th>\n      <td>United Kingdom, France, United States, Belgium</td>\n      <td>1</td>\n    </tr>\n    <tr>\n      <th>680</th>\n      <td>France, Norway, Lebanon, Belgium</td>\n      <td>1</td>\n    </tr>\n  </tbody>\n</table>\n<p>681 rows × 2 columns</p>\n</div>"},"metadata":{}}],"execution_count":27},{"cell_type":"code","source":"most_frequent_country = df['country'].mode()[0]\nprint(most_frequent_country)","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T20:10:53.951235Z","iopub.execute_input":"2025-12-27T20:10:53.951641Z","iopub.status.idle":"2025-12-27T20:10:53.958444Z","shell.execute_reply.started":"2025-12-27T20:10:53.951613Z","shell.execute_reply":"2025-12-27T20:10:53.957252Z"}},"outputs":[{"name":"stdout","text":"United States\n","output_type":"stream"}],"execution_count":37},{"cell_type":"code","source":"df['country'] = df['country'].fillna(most_frequent_country)","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T20:10:57.809893Z","iopub.execute_input":"2025-12-27T20:10:57.810957Z","iopub.status.idle":"2025-12-27T20:10:57.816628Z","shell.execute_reply.started":"2025-12-27T20:10:57.810898Z","shell.execute_reply":"2025-12-27T20:10:57.815610Z"}},"outputs":[],"execution_count":38},{"cell_type":"code","source":"df.isnull().sum()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T20:11:00.043754Z","iopub.execute_input":"2025-12-27T20:11:00.044114Z","iopub.status.idle":"2025-12-27T20:11:00.057617Z","shell.execute_reply.started":"2025-12-27T20:11:00.044082Z","shell.execute_reply":"2025-12-27T20:11:00.056515Z"}},"outputs":[{"execution_count":39,"output_type":"execute_result","data":{"text/plain":"show_id          0\ntype             0\ntitle            0\ndirector         0\ncast             0\ncountry          0\ndate_added      10\nrelease_year     0\nrating           7\nduration         0\nlisted_in        0\ndescription      0\ndtype: int64"},"metadata":{}}],"execution_count":39},{"cell_type":"markdown","source":"## Handeling the missing values in date and rating column\n- due to small missing values, droping those rows","metadata":{}},{"cell_type":"code","source":"df.dropna(subset=['date_added','rating'], inplace=True)","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T20:15:08.285435Z","iopub.execute_input":"2025-12-27T20:15:08.285793Z","iopub.status.idle":"2025-12-27T20:15:08.298677Z","shell.execute_reply.started":"2025-12-27T20:15:08.285763Z","shell.execute_reply":"2025-12-27T20:15:08.297664Z"}},"outputs":[],"execution_count":40},{"cell_type":"code","source":"df.isnull().sum()","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T20:15:42.680053Z","iopub.execute_input":"2025-12-27T20:15:42.680418Z","iopub.status.idle":"2025-12-27T20:15:42.694637Z","shell.execute_reply.started":"2025-12-27T20:15:42.680388Z","shell.execute_reply":"2025-12-27T20:15:42.693614Z"}},"outputs":[{"execution_count":42,"output_type":"execute_result","data":{"text/plain":"show_id         0\ntype            0\ntitle           0\ndirector        0\ncast            0\ncountry         0\ndate_added      0\nrelease_year    0\nrating          0\nduration        0\nlisted_in       0\ndescription     0\ndtype: int64"},"metadata":{}}],"execution_count":42},{"cell_type":"markdown","source":"## Changing the Date dtype to datetime format","metadata":{}},{"cell_type":"code","source":"df['date_added'] = pd.to_datetime(df['date_added'],format=\"mixed\",dayfirst=True)\ndf[\"date_added\"]","metadata":{"trusted":true,"execution":{"iopub.status.busy":"2025-12-27T20:31:12.256841Z","iopub.execute_input":"2025-12-27T20:31:12.257205Z","iopub.status.idle":"2025-12-27T20:31:12.278686Z","shell.execute_reply.started":"2025-12-27T20:31:12.257174Z","shell.execute_reply":"2025-12-27T20:31:12.277736Z"}},"outputs":[{"execution_count":44,"output_type":"execute_result","data":{"text/plain":"date_added\n2020-01-01    119\n2019-11-01     96\n2018-03-01     76\n2019-12-31     76\n2018-10-01     72\n             ... \n2014-11-07      1\n2015-02-13      1\n2015-10-09      1\n2017-05-31      1\n2017-02-02      1\nName: count, Length: 1511, dtype: int64"},"metadata":{}}],"execution_count":44},{"cell_type":"markdown","source":"## creating 2 new feature column year and month ","metadata":{}},{"cell_type":"code","source":"","metadata":{"trusted":true},"outputs":[],"execution_count":null}]}
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "1def4079",
+   "metadata": {
+    "papermill": {
+     "duration": 0.007308,
+     "end_time": "2025-12-27T22:05:55.992859",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:55.985551",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## Netflix Content Analysis 🎬"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5514b47e",
+   "metadata": {
+    "papermill": {
+     "duration": 0.006263,
+     "end_time": "2025-12-27T22:05:56.005300",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:55.999037",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "### Importing the required libaries with the dataset of netflix"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "4b4ea0d9",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:56.019522Z",
+     "iopub.status.busy": "2025-12-27T22:05:56.019168Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.217619Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.216298Z"
+    },
+    "papermill": {
+     "duration": 3.20805,
+     "end_time": "2025-12-27T22:05:59.219609",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:56.011559",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "All the required lib are imported\n"
+     ]
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import seaborn as sns\n",
+    "\n",
+    "print(\"All the required lib are imported\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "e143250c",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.234736Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.234279Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.375769Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.374895Z"
+    },
+    "papermill": {
+     "duration": 0.150595,
+     "end_time": "2025-12-27T22:05:59.377570",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.226975",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>show_id</th>\n",
+       "      <th>type</th>\n",
+       "      <th>title</th>\n",
+       "      <th>director</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>country</th>\n",
+       "      <th>date_added</th>\n",
+       "      <th>release_year</th>\n",
+       "      <th>rating</th>\n",
+       "      <th>duration</th>\n",
+       "      <th>listed_in</th>\n",
+       "      <th>description</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>s1</td>\n",
+       "      <td>TV Show</td>\n",
+       "      <td>3%</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>João Miguel, Bianca Comparato, Michel Gomes, R...</td>\n",
+       "      <td>Brazil</td>\n",
+       "      <td>August 14, 2020</td>\n",
+       "      <td>2020</td>\n",
+       "      <td>TV-MA</td>\n",
+       "      <td>4 Seasons</td>\n",
+       "      <td>International TV Shows, TV Dramas, TV Sci-Fi &amp;...</td>\n",
+       "      <td>In a future where the elite inhabit an island ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>s2</td>\n",
+       "      <td>Movie</td>\n",
+       "      <td>7:19</td>\n",
+       "      <td>Jorge Michel Grau</td>\n",
+       "      <td>Demián Bichir, Héctor Bonilla, Oscar Serrano, ...</td>\n",
+       "      <td>Mexico</td>\n",
+       "      <td>December 23, 2016</td>\n",
+       "      <td>2016</td>\n",
+       "      <td>TV-MA</td>\n",
+       "      <td>93 min</td>\n",
+       "      <td>Dramas, International Movies</td>\n",
+       "      <td>After a devastating earthquake hits Mexico Cit...</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "  show_id     type title           director  \\\n",
+       "0      s1  TV Show    3%                NaN   \n",
+       "1      s2    Movie  7:19  Jorge Michel Grau   \n",
+       "\n",
+       "                                                cast country  \\\n",
+       "0  João Miguel, Bianca Comparato, Michel Gomes, R...  Brazil   \n",
+       "1  Demián Bichir, Héctor Bonilla, Oscar Serrano, ...  Mexico   \n",
+       "\n",
+       "          date_added  release_year rating   duration  \\\n",
+       "0    August 14, 2020          2020  TV-MA  4 Seasons   \n",
+       "1  December 23, 2016          2016  TV-MA     93 min   \n",
+       "\n",
+       "                                           listed_in  \\\n",
+       "0  International TV Shows, TV Dramas, TV Sci-Fi &...   \n",
+       "1                       Dramas, International Movies   \n",
+       "\n",
+       "                                         description  \n",
+       "0  In a future where the elite inhabit an island ...  \n",
+       "1  After a devastating earthquake hits Mexico Cit...  "
+      ]
+     },
+     "execution_count": 2,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df = pd.read_csv(\"/kaggle/input/netflix-csv/netflix_titles.csv\") #importing the DataFrame\n",
+    "# pd.reset_option(\"display.max_row\",None)\n",
+    "# pd.set_option(\"display.max_columns\",None)\n",
+    "df.head(2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "93613223",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.392052Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.391685Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.418158Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.417099Z"
+    },
+    "papermill": {
+     "duration": 0.035967,
+     "end_time": "2025-12-27T22:05:59.420214",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.384247",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "RangeIndex: 7787 entries, 0 to 7786\n",
+      "Data columns (total 12 columns):\n",
+      " #   Column        Non-Null Count  Dtype \n",
+      "---  ------        --------------  ----- \n",
+      " 0   show_id       7787 non-null   object\n",
+      " 1   type          7787 non-null   object\n",
+      " 2   title         7787 non-null   object\n",
+      " 3   director      5398 non-null   object\n",
+      " 4   cast          7069 non-null   object\n",
+      " 5   country       7280 non-null   object\n",
+      " 6   date_added    7777 non-null   object\n",
+      " 7   release_year  7787 non-null   int64 \n",
+      " 8   rating        7780 non-null   object\n",
+      " 9   duration      7787 non-null   object\n",
+      " 10  listed_in     7787 non-null   object\n",
+      " 11  description   7787 non-null   object\n",
+      "dtypes: int64(1), object(11)\n",
+      "memory usage: 730.2+ KB\n"
+     ]
+    }
+   ],
+   "source": [
+    "df.info() #checking the structure of the dataframe"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "68200862",
+   "metadata": {
+    "papermill": {
+     "duration": 0.00633,
+     "end_time": "2025-12-27T22:05:59.432822",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.426492",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## Interpretation of the above cell\n",
+    "- Date column is in object(string) Dtype, need to be in datetime object\n",
+    "- missing values in director, cast, country, date_added, rating column"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "9f3223ba",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.446839Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.446459Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.458460Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.457692Z"
+    },
+    "papermill": {
+     "duration": 0.020805,
+     "end_time": "2025-12-27T22:05:59.459971",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.439166",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "show_id            0\n",
+       "type               0\n",
+       "title              0\n",
+       "director        2389\n",
+       "cast             718\n",
+       "country          507\n",
+       "date_added        10\n",
+       "release_year       0\n",
+       "rating             7\n",
+       "duration           0\n",
+       "listed_in          0\n",
+       "description        0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.isnull().sum() #checking for the missing values in dataframe"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "1fafc94d",
+   "metadata": {
+    "papermill": {
+     "duration": 0.006225,
+     "end_time": "2025-12-27T22:05:59.472537",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.466312",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## We can see the here the missing data from each column\n",
+    "- Necessary actions will be taken place regarding the missing data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "1a271236",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.486458Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.486165Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.495613Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.494664Z"
+    },
+    "papermill": {
+     "duration": 0.018763,
+     "end_time": "2025-12-27T22:05:59.497405",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.478642",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Director Column data:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>index</th>\n",
+       "      <th>director</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1</td>\n",
+       "      <td>Jorge Michel Grau</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2</td>\n",
+       "      <td>Gilbert Chan</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>3</td>\n",
+       "      <td>Shane Acker</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>4</td>\n",
+       "      <td>Robert Luketic</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   index           director\n",
+       "0      0                NaN\n",
+       "1      1  Jorge Michel Grau\n",
+       "2      2       Gilbert Chan\n",
+       "3      3        Shane Acker\n",
+       "4      4     Robert Luketic"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Director Column data:\")\n",
+    "df['director'].head(5).reset_index()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "c3289c62",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.512412Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.512105Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.525817Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.524944Z"
+    },
+    "papermill": {
+     "duration": 0.023179,
+     "end_time": "2025-12-27T22:05:59.527451",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.504272",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Missing data Director :\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>director</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>False</td>\n",
+       "      <td>5398</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>True</td>\n",
+       "      <td>2389</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   director  count\n",
+       "0     False   5398\n",
+       "1      True   2389"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Missing data Director :\")\n",
+    "df['director'].isnull().value_counts().reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "d6b36d5f",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.542856Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.542153Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.551049Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.550231Z"
+    },
+    "papermill": {
+     "duration": 0.018621,
+     "end_time": "2025-12-27T22:05:59.552767",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.534146",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Cast Column data:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>index</th>\n",
+       "      <th>cast</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>João Miguel, Bianca Comparato, Michel Gomes, R...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1</td>\n",
+       "      <td>Demián Bichir, Héctor Bonilla, Oscar Serrano, ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2</td>\n",
+       "      <td>Tedd Chan, Stella Chung, Henley Hii, Lawrence ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>3</td>\n",
+       "      <td>Elijah Wood, John C. Reilly, Jennifer Connelly...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>4</td>\n",
+       "      <td>Jim Sturgess, Kevin Spacey, Kate Bosworth, Aar...</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   index                                               cast\n",
+       "0      0  João Miguel, Bianca Comparato, Michel Gomes, R...\n",
+       "1      1  Demián Bichir, Héctor Bonilla, Oscar Serrano, ...\n",
+       "2      2  Tedd Chan, Stella Chung, Henley Hii, Lawrence ...\n",
+       "3      3  Elijah Wood, John C. Reilly, Jennifer Connelly...\n",
+       "4      4  Jim Sturgess, Kevin Spacey, Kate Bosworth, Aar..."
+      ]
+     },
+     "execution_count": 7,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Cast Column data:\")\n",
+    "df['cast'].head(5).reset_index()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "39bca043",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.568383Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.567736Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.578195Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.577371Z"
+    },
+    "papermill": {
+     "duration": 0.020165,
+     "end_time": "2025-12-27T22:05:59.579833",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.559668",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Missing data Cast :\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>cast</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>False</td>\n",
+       "      <td>7069</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>True</td>\n",
+       "      <td>718</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    cast  count\n",
+       "0  False   7069\n",
+       "1   True    718"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Missing data Cast :\")\n",
+    "df['cast'].isnull().value_counts().reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "d1d67959",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.595807Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.595482Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.604768Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.603902Z"
+    },
+    "papermill": {
+     "duration": 0.019311,
+     "end_time": "2025-12-27T22:05:59.606522",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.587211",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Country Column data:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>index</th>\n",
+       "      <th>country</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>Brazil</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1</td>\n",
+       "      <td>Mexico</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2</td>\n",
+       "      <td>Singapore</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>3</td>\n",
+       "      <td>United States</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>4</td>\n",
+       "      <td>United States</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   index        country\n",
+       "0      0         Brazil\n",
+       "1      1         Mexico\n",
+       "2      2      Singapore\n",
+       "3      3  United States\n",
+       "4      4  United States"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Country Column data:\")\n",
+    "df['country'].head(5).reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "f7a3fb58",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.622620Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.622278Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.632079Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.631260Z"
+    },
+    "papermill": {
+     "duration": 0.020196,
+     "end_time": "2025-12-27T22:05:59.633937",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.613741",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Missing data country :\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>country</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>False</td>\n",
+       "      <td>7280</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>True</td>\n",
+       "      <td>507</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   country  count\n",
+       "0    False   7280\n",
+       "1     True    507"
+      ]
+     },
+     "execution_count": 10,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Missing data country :\")\n",
+    "df['country'].isnull().value_counts().reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "32168ea5",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.650095Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.649768Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.658467Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.657693Z"
+    },
+    "papermill": {
+     "duration": 0.018777,
+     "end_time": "2025-12-27T22:05:59.660208",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.641431",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Date Column data:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>index</th>\n",
+       "      <th>date_added</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>August 14, 2020</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1</td>\n",
+       "      <td>December 23, 2016</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2</td>\n",
+       "      <td>December 20, 2018</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>3</td>\n",
+       "      <td>November 16, 2017</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>4</td>\n",
+       "      <td>January 1, 2020</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   index         date_added\n",
+       "0      0    August 14, 2020\n",
+       "1      1  December 23, 2016\n",
+       "2      2  December 20, 2018\n",
+       "3      3  November 16, 2017\n",
+       "4      4    January 1, 2020"
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Date Column data:\")\n",
+    "df['date_added'].head(5).reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "c98f45a7",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.676368Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.676085Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.685472Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.684619Z"
+    },
+    "papermill": {
+     "duration": 0.019645,
+     "end_time": "2025-12-27T22:05:59.687225",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.667580",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Missing data in Date:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>date_added</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>False</td>\n",
+       "      <td>7777</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>True</td>\n",
+       "      <td>10</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   date_added  count\n",
+       "0       False   7777\n",
+       "1        True     10"
+      ]
+     },
+     "execution_count": 12,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Missing data in Date:\")\n",
+    "df['date_added'].isnull().value_counts().reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "aa79b950",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.704366Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.703703Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.712602Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.711753Z"
+    },
+    "papermill": {
+     "duration": 0.019567,
+     "end_time": "2025-12-27T22:05:59.714383",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.694816",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Rating Column data:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>index</th>\n",
+       "      <th>rating</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>0</td>\n",
+       "      <td>TV-MA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>1</td>\n",
+       "      <td>TV-MA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2</td>\n",
+       "      <td>R</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>3</td>\n",
+       "      <td>PG-13</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>4</td>\n",
+       "      <td>PG-13</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   index rating\n",
+       "0      0  TV-MA\n",
+       "1      1  TV-MA\n",
+       "2      2      R\n",
+       "3      3  PG-13\n",
+       "4      4  PG-13"
+      ]
+     },
+     "execution_count": 13,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Rating Column data:\")\n",
+    "df['rating'].head(5).reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "id": "bc564b11",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.731863Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.731149Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.741599Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.740557Z"
+    },
+    "papermill": {
+     "duration": 0.021172,
+     "end_time": "2025-12-27T22:05:59.743309",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.722137",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Missing data in rating:\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>rating</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>False</td>\n",
+       "      <td>7780</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>True</td>\n",
+       "      <td>7</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   rating  count\n",
+       "0   False   7780\n",
+       "1    True      7"
+      ]
+     },
+     "execution_count": 14,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "print(\"Missing data in rating:\")\n",
+    "df['rating'].isnull().value_counts().reset_index()\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c5fe385d",
+   "metadata": {
+    "papermill": {
+     "duration": 0.007653,
+     "end_time": "2025-12-27T22:05:59.758711",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.751058",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## Cleaning and Transforming the data\n",
+    "- cast and director nan values will be changed to empty\n",
+    "- changing the Dtype of date to datetime\n",
+    "- mode the country, most frequent one\n",
+    "- droping few rows from rating and date as there is very little data is missing"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "878d8786",
+   "metadata": {
+    "papermill": {
+     "duration": 0.00786,
+     "end_time": "2025-12-27T22:05:59.774272",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.766412",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "### Changing the Director NaN values"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "f25a5966",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.792330Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.791607Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.806288Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.805463Z"
+    },
+    "papermill": {
+     "duration": 0.025877,
+     "end_time": "2025-12-27T22:05:59.808008",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.782131",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>show_id</th>\n",
+       "      <th>type</th>\n",
+       "      <th>title</th>\n",
+       "      <th>director</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>country</th>\n",
+       "      <th>date_added</th>\n",
+       "      <th>release_year</th>\n",
+       "      <th>rating</th>\n",
+       "      <th>duration</th>\n",
+       "      <th>listed_in</th>\n",
+       "      <th>description</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>s1</td>\n",
+       "      <td>TV Show</td>\n",
+       "      <td>3%</td>\n",
+       "      <td>Unknown</td>\n",
+       "      <td>João Miguel, Bianca Comparato, Michel Gomes, R...</td>\n",
+       "      <td>Brazil</td>\n",
+       "      <td>August 14, 2020</td>\n",
+       "      <td>2020</td>\n",
+       "      <td>TV-MA</td>\n",
+       "      <td>4 Seasons</td>\n",
+       "      <td>International TV Shows, TV Dramas, TV Sci-Fi &amp;...</td>\n",
+       "      <td>In a future where the elite inhabit an island ...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>s2</td>\n",
+       "      <td>Movie</td>\n",
+       "      <td>7:19</td>\n",
+       "      <td>Jorge Michel Grau</td>\n",
+       "      <td>Demián Bichir, Héctor Bonilla, Oscar Serrano, ...</td>\n",
+       "      <td>Mexico</td>\n",
+       "      <td>December 23, 2016</td>\n",
+       "      <td>2016</td>\n",
+       "      <td>TV-MA</td>\n",
+       "      <td>93 min</td>\n",
+       "      <td>Dramas, International Movies</td>\n",
+       "      <td>After a devastating earthquake hits Mexico Cit...</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "  show_id     type title           director  \\\n",
+       "0      s1  TV Show    3%            Unknown   \n",
+       "1      s2    Movie  7:19  Jorge Michel Grau   \n",
+       "\n",
+       "                                                cast country  \\\n",
+       "0  João Miguel, Bianca Comparato, Michel Gomes, R...  Brazil   \n",
+       "1  Demián Bichir, Héctor Bonilla, Oscar Serrano, ...  Mexico   \n",
+       "\n",
+       "          date_added  release_year rating   duration  \\\n",
+       "0    August 14, 2020          2020  TV-MA  4 Seasons   \n",
+       "1  December 23, 2016          2016  TV-MA     93 min   \n",
+       "\n",
+       "                                           listed_in  \\\n",
+       "0  International TV Shows, TV Dramas, TV Sci-Fi &...   \n",
+       "1                       Dramas, International Movies   \n",
+       "\n",
+       "                                         description  \n",
+       "0  In a future where the elite inhabit an island ...  \n",
+       "1  After a devastating earthquake hits Mexico Cit...  "
+      ]
+     },
+     "execution_count": 15,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df['director'] = df['director'].fillna(\"Unknown\")\n",
+    "df.head(2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "id": "f80b8a65",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.826282Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.825424Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.837764Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.836740Z"
+    },
+    "papermill": {
+     "duration": 0.02332,
+     "end_time": "2025-12-27T22:05:59.839528",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.816208",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>director</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>False</td>\n",
+       "      <td>5398</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>True</td>\n",
+       "      <td>2389</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   director  count\n",
+       "0     False   5398\n",
+       "1      True   2389"
+      ]
+     },
+     "execution_count": 16,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df[\"director\"].str.contains(\"Unknown\").value_counts().reset_index()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a30c4723",
+   "metadata": {
+    "papermill": {
+     "duration": 0.009321,
+     "end_time": "2025-12-27T22:05:59.857147",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.847826",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "### Changing the Cast NaN values"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "a0ccd5d1",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.875217Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.874458Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.886909Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.886036Z"
+    },
+    "papermill": {
+     "duration": 0.023431,
+     "end_time": "2025-12-27T22:05:59.888676",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.865245",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>cast</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Unknown</td>\n",
+       "      <td>718</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "      cast  count\n",
+       "0  Unknown    718"
+      ]
+     },
+     "execution_count": 17,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df['cast'] = df['cast'].fillna(\"Unknown\")\n",
+    "df.loc[df['cast'] == 'Unknown','cast'].value_counts().reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "2bfbf1aa",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.907021Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.906215Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.918772Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.917954Z"
+    },
+    "papermill": {
+     "duration": 0.023856,
+     "end_time": "2025-12-27T22:05:59.920680",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.896824",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "show_id           0\n",
+       "type              0\n",
+       "title             0\n",
+       "director          0\n",
+       "cast              0\n",
+       "country         507\n",
+       "date_added       10\n",
+       "release_year      0\n",
+       "rating            7\n",
+       "duration          0\n",
+       "listed_in         0\n",
+       "description       0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 18,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.isna().sum()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "856887a9",
+   "metadata": {
+    "papermill": {
+     "duration": 0.008483,
+     "end_time": "2025-12-27T22:05:59.937585",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.929102",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## Filling out the missing country data\n",
+    "- using mode for the most frequent country and changing it "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "966b870a",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.955531Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.955240Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.964725Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.963931Z"
+    },
+    "papermill": {
+     "duration": 0.020503,
+     "end_time": "2025-12-27T22:05:59.966366",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.945863",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>country</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>Missing country</th>\n",
+       "      <td>False</td>\n",
+       "      <td>7280</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>country not missing</th>\n",
+       "      <td>True</td>\n",
+       "      <td>507</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                     country  count\n",
+       "Missing country        False   7280\n",
+       "country not missing     True    507"
+      ]
+     },
+     "execution_count": 19,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df[\"country\"].isnull().value_counts().reset_index().rename({0: 'Missing country',1:\"country not missing\"})"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "6fc19ea9",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:05:59.985494Z",
+     "iopub.status.busy": "2025-12-27T22:05:59.985202Z",
+     "iopub.status.idle": "2025-12-27T22:05:59.996093Z",
+     "shell.execute_reply": "2025-12-27T22:05:59.995278Z"
+    },
+    "papermill": {
+     "duration": 0.022928,
+     "end_time": "2025-12-27T22:05:59.997718",
+     "exception": false,
+     "start_time": "2025-12-27T22:05:59.974790",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>country</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>United States</td>\n",
+       "      <td>2555</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>India</td>\n",
+       "      <td>923</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>United Kingdom</td>\n",
+       "      <td>397</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Japan</td>\n",
+       "      <td>226</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>South Korea</td>\n",
+       "      <td>183</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>676</th>\n",
+       "      <td>Germany, United States, United Kingdom, Canada</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>677</th>\n",
+       "      <td>Peru, United States, United Kingdom</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>678</th>\n",
+       "      <td>Saudi Arabia, United Arab Emirates</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>679</th>\n",
+       "      <td>United Kingdom, France, United States, Belgium</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>680</th>\n",
+       "      <td>France, Norway, Lebanon, Belgium</td>\n",
+       "      <td>1</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>681 rows × 2 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                                            country  count\n",
+       "0                                     United States   2555\n",
+       "1                                             India    923\n",
+       "2                                    United Kingdom    397\n",
+       "3                                             Japan    226\n",
+       "4                                       South Korea    183\n",
+       "..                                              ...    ...\n",
+       "676  Germany, United States, United Kingdom, Canada      1\n",
+       "677             Peru, United States, United Kingdom      1\n",
+       "678              Saudi Arabia, United Arab Emirates      1\n",
+       "679  United Kingdom, France, United States, Belgium      1\n",
+       "680                France, Norway, Lebanon, Belgium      1\n",
+       "\n",
+       "[681 rows x 2 columns]"
+      ]
+     },
+     "execution_count": 20,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df['country'].value_counts().reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "44f57453",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:06:00.016938Z",
+     "iopub.status.busy": "2025-12-27T22:06:00.016597Z",
+     "iopub.status.idle": "2025-12-27T22:06:00.023921Z",
+     "shell.execute_reply": "2025-12-27T22:06:00.022920Z"
+    },
+    "papermill": {
+     "duration": 0.019059,
+     "end_time": "2025-12-27T22:06:00.025689",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.006630",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "United States\n"
+     ]
+    }
+   ],
+   "source": [
+    "most_frequent_country = df['country'].mode()[0]\n",
+    "print(most_frequent_country)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "id": "327e1e56",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:06:00.044649Z",
+     "iopub.status.busy": "2025-12-27T22:06:00.044343Z",
+     "iopub.status.idle": "2025-12-27T22:06:00.050133Z",
+     "shell.execute_reply": "2025-12-27T22:06:00.049229Z"
+    },
+    "papermill": {
+     "duration": 0.01743,
+     "end_time": "2025-12-27T22:06:00.051909",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.034479",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "df['country'] = df['country'].fillna(most_frequent_country)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "17bb44c2",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:06:00.071508Z",
+     "iopub.status.busy": "2025-12-27T22:06:00.071162Z",
+     "iopub.status.idle": "2025-12-27T22:06:00.083950Z",
+     "shell.execute_reply": "2025-12-27T22:06:00.083122Z"
+    },
+    "papermill": {
+     "duration": 0.02461,
+     "end_time": "2025-12-27T22:06:00.085611",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.061001",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "show_id          0\n",
+       "type             0\n",
+       "title            0\n",
+       "director         0\n",
+       "cast             0\n",
+       "country          0\n",
+       "date_added      10\n",
+       "release_year     0\n",
+       "rating           7\n",
+       "duration         0\n",
+       "listed_in        0\n",
+       "description      0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 23,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "248d4f91",
+   "metadata": {
+    "papermill": {
+     "duration": 0.008788,
+     "end_time": "2025-12-27T22:06:00.103251",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.094463",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## Handeling the missing values in date and rating column\n",
+    "- due to small missing values, droping those rows"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "1d59f06a",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:06:00.122020Z",
+     "iopub.status.busy": "2025-12-27T22:06:00.121681Z",
+     "iopub.status.idle": "2025-12-27T22:06:00.133842Z",
+     "shell.execute_reply": "2025-12-27T22:06:00.132936Z"
+    },
+    "papermill": {
+     "duration": 0.023989,
+     "end_time": "2025-12-27T22:06:00.135914",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.111925",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "df.dropna(subset=['date_added','rating'], inplace=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "id": "72767789",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:06:00.155025Z",
+     "iopub.status.busy": "2025-12-27T22:06:00.154654Z",
+     "iopub.status.idle": "2025-12-27T22:06:00.167097Z",
+     "shell.execute_reply": "2025-12-27T22:06:00.166158Z"
+    },
+    "papermill": {
+     "duration": 0.024026,
+     "end_time": "2025-12-27T22:06:00.168838",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.144812",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "show_id         0\n",
+       "type            0\n",
+       "title           0\n",
+       "director        0\n",
+       "cast            0\n",
+       "country         0\n",
+       "date_added      0\n",
+       "release_year    0\n",
+       "rating          0\n",
+       "duration        0\n",
+       "listed_in       0\n",
+       "description     0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 25,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a682e01f",
+   "metadata": {
+    "papermill": {
+     "duration": 0.008888,
+     "end_time": "2025-12-27T22:06:00.186714",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.177826",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## Changing the Date dtype to datetime format"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "02b2130b",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:06:00.206451Z",
+     "iopub.status.busy": "2025-12-27T22:06:00.206134Z",
+     "iopub.status.idle": "2025-12-27T22:06:00.320664Z",
+     "shell.execute_reply": "2025-12-27T22:06:00.319852Z"
+    },
+    "papermill": {
+     "duration": 0.126809,
+     "end_time": "2025-12-27T22:06:00.322664",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.195855",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0      2020-08-14\n",
+       "1      2016-12-23\n",
+       "2      2018-12-20\n",
+       "3      2017-11-16\n",
+       "4      2020-01-01\n",
+       "          ...    \n",
+       "7782   2020-10-19\n",
+       "7783   2019-03-02\n",
+       "7784   2020-09-25\n",
+       "7785   2020-10-31\n",
+       "7786   2020-03-01\n",
+       "Name: date_added, Length: 7770, dtype: datetime64[ns]"
+      ]
+     },
+     "execution_count": 26,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df['date_added'] = pd.to_datetime(df['date_added'],format=\"mixed\",dayfirst=True)\n",
+    "df[\"date_added\"]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "85746acf",
+   "metadata": {
+    "papermill": {
+     "duration": 0.008687,
+     "end_time": "2025-12-27T22:06:00.340244",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.331557",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## creating 2 new feature column year and month "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "id": "26404cfe",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:06:00.359728Z",
+     "iopub.status.busy": "2025-12-27T22:06:00.358945Z",
+     "iopub.status.idle": "2025-12-27T22:06:00.366151Z",
+     "shell.execute_reply": "2025-12-27T22:06:00.365098Z"
+    },
+    "papermill": {
+     "duration": 0.019266,
+     "end_time": "2025-12-27T22:06:00.368176",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.348910",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "df['year'] = df['date_added'].dt.year\n",
+    "df['month'] = df['date_added'].dt.month"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "id": "c8994ea8",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:06:00.387049Z",
+     "iopub.status.busy": "2025-12-27T22:06:00.386716Z",
+     "iopub.status.idle": "2025-12-27T22:06:00.399369Z",
+     "shell.execute_reply": "2025-12-27T22:06:00.398625Z"
+    },
+    "papermill": {
+     "duration": 0.024116,
+     "end_time": "2025-12-27T22:06:00.401052",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.376936",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>show_id</th>\n",
+       "      <th>type</th>\n",
+       "      <th>title</th>\n",
+       "      <th>director</th>\n",
+       "      <th>cast</th>\n",
+       "      <th>country</th>\n",
+       "      <th>date_added</th>\n",
+       "      <th>release_year</th>\n",
+       "      <th>rating</th>\n",
+       "      <th>duration</th>\n",
+       "      <th>listed_in</th>\n",
+       "      <th>description</th>\n",
+       "      <th>year</th>\n",
+       "      <th>month</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>s1</td>\n",
+       "      <td>TV Show</td>\n",
+       "      <td>3%</td>\n",
+       "      <td>Unknown</td>\n",
+       "      <td>João Miguel, Bianca Comparato, Michel Gomes, R...</td>\n",
+       "      <td>Brazil</td>\n",
+       "      <td>2020-08-14</td>\n",
+       "      <td>2020</td>\n",
+       "      <td>TV-MA</td>\n",
+       "      <td>4 Seasons</td>\n",
+       "      <td>International TV Shows, TV Dramas, TV Sci-Fi &amp;...</td>\n",
+       "      <td>In a future where the elite inhabit an island ...</td>\n",
+       "      <td>2020</td>\n",
+       "      <td>8</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>s2</td>\n",
+       "      <td>Movie</td>\n",
+       "      <td>7:19</td>\n",
+       "      <td>Jorge Michel Grau</td>\n",
+       "      <td>Demián Bichir, Héctor Bonilla, Oscar Serrano, ...</td>\n",
+       "      <td>Mexico</td>\n",
+       "      <td>2016-12-23</td>\n",
+       "      <td>2016</td>\n",
+       "      <td>TV-MA</td>\n",
+       "      <td>93 min</td>\n",
+       "      <td>Dramas, International Movies</td>\n",
+       "      <td>After a devastating earthquake hits Mexico Cit...</td>\n",
+       "      <td>2016</td>\n",
+       "      <td>12</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "  show_id     type title           director  \\\n",
+       "0      s1  TV Show    3%            Unknown   \n",
+       "1      s2    Movie  7:19  Jorge Michel Grau   \n",
+       "\n",
+       "                                                cast country date_added  \\\n",
+       "0  João Miguel, Bianca Comparato, Michel Gomes, R...  Brazil 2020-08-14   \n",
+       "1  Demián Bichir, Héctor Bonilla, Oscar Serrano, ...  Mexico 2016-12-23   \n",
+       "\n",
+       "   release_year rating   duration  \\\n",
+       "0          2020  TV-MA  4 Seasons   \n",
+       "1          2016  TV-MA     93 min   \n",
+       "\n",
+       "                                           listed_in  \\\n",
+       "0  International TV Shows, TV Dramas, TV Sci-Fi &...   \n",
+       "1                       Dramas, International Movies   \n",
+       "\n",
+       "                                         description  year  month  \n",
+       "0  In a future where the elite inhabit an island ...  2020      8  \n",
+       "1  After a devastating earthquake hits Mexico Cit...  2016     12  "
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df.head(2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e36fe546",
+   "metadata": {
+    "papermill": {
+     "duration": 0.008948,
+     "end_time": "2025-12-27T22:06:00.419251",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.410303",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Distribution of content types"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "id": "7a80c108",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:06:00.438917Z",
+     "iopub.status.busy": "2025-12-27T22:06:00.438574Z",
+     "iopub.status.idle": "2025-12-27T22:06:00.444446Z",
+     "shell.execute_reply": "2025-12-27T22:06:00.443649Z"
+    },
+    "papermill": {
+     "duration": 0.018017,
+     "end_time": "2025-12-27T22:06:00.446328",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.428311",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "type\n",
+      "Movie      5372\n",
+      "TV Show    2398\n",
+      "Name: count, dtype: int64\n"
+     ]
+    }
+   ],
+   "source": [
+    "type_count = df['type'].value_counts()\n",
+    "print(type_count)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "id": "1ab76d75",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:06:00.466080Z",
+     "iopub.status.busy": "2025-12-27T22:06:00.465738Z",
+     "iopub.status.idle": "2025-12-27T22:06:00.469911Z",
+     "shell.execute_reply": "2025-12-27T22:06:00.469093Z"
+    },
+    "papermill": {
+     "duration": 0.015999,
+     "end_time": "2025-12-27T22:06:00.471605",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.455606",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "color = [\n",
+    "    \"#F4E8FF\",  # powder lavender\n",
+    "    \"#E6D8FF\",  # soft lilac\n",
+    "    \"#D6C7FF\",  # pastel violet\n",
+    "    \"#C6B5FF\",  # light periwinkle\n",
+    "    \"#B5A3FF\",  # muted purple-blue\n",
+    "    \"#A391FF\"   # gentle indigo\n",
+    "]\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "id": "99076522",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:06:00.492066Z",
+     "iopub.status.busy": "2025-12-27T22:06:00.491715Z",
+     "iopub.status.idle": "2025-12-27T22:06:00.660866Z",
+     "shell.execute_reply": "2025-12-27T22:06:00.659956Z"
+    },
+    "papermill": {
+     "duration": 0.18161,
+     "end_time": "2025-12-27T22:06:00.662659",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.481049",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Text(0.5, 1.0, 'Types of Content Distribution')"
+      ]
+     },
+     "execution_count": 31,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "iVBORw0KGgoAAAANSUhEUgAAAnwAAAKSCAYAAABIowakAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjAsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvlHJYcgAAAAlwSFlzAAAPYQAAD2EBqD+naQAAVx5JREFUeJzt3Xd4XOWd9vH7TFUvlmRLLpJsy51uerGd0GOyENhACARsTNkEMCF5ySab3UA2kJAKAQIhEDAJOBAICaRRkgUTA6bZxr333ov6lPP+ceTBsi1pJM3MM3Pm+7kuXZJmjmZ+Mz7WufVUy7ZtWwAAAHAtj+kCAAAAkFwEPgAAAJcj8AEAALgcgQ8AAMDlCHwAAAAuR+ADAABwOQIfAACAyxH4AAAAXI7ABwAA4HIEPgDt1NfX6/rrr1dlZaUsy9JXv/pV0yVljdraWk2aNCnpz7NmzRpZlqVp06bFbps0aZIKCgqS/twHWJalu+66K2XPB2Q7Ah9wCMuy4vp48803TZeaFN///vc1bdo0ffnLX9Zvf/tbfelLX+r0+EgkoieffFITJkxQnz59FAwGVVtbq8mTJ+vDDz9Maq0PP/xwu9CSTH/729+6FVAmTJgQO1c8Ho+Kioo0YsQIfelLX9Lrr79urK5USufagGxjsZcu0N7TTz/d7vvf/OY3ev311/Xb3/623e3nnnuu+vXrl8rSUuLUU0+Vz+fTzJkzuzy2qalJl156qV555RWNGzdOn/3sZ9WnTx+tWbNGv//977Vs2TKtW7dOAwcOTEqtRx11lMrLy1MSvm+55Rb94he/ULy/MidMmKCVK1fqBz/4gSSpoaFBK1as0IsvvqhVq1bp8ssv19NPPy2/3x/7mZaWFnk8nna3JbouSbJtWy0tLfL7/fJ6vZKcFr4XXnhB9fX1cT9Ob2prbm6Wz+eTz+dL2PMB6Bj/04BDXH311e2+nzVrll5//fXDbnerbdu2afTo0XEde8cdd+iVV17Rfffdd1jX75133qn77rsvCRVmjuLi4sPOm3vvvVdTp07Vww8/rNraWv3whz+M3RcMBpNaTzgcVjQaVSAQUE5OTlKfqyumnx/IOjaATt188832wf9VrrnmGrusrMxubW097Nhzzz3XHj58eOx7SfbNN99sP/300/bw4cPtYDBon3DCCfaMGTMO+9kNGzbYkydPtvv27WsHAgF79OjR9q9//evDjnvggQfs0aNH27m5uXZJSYk9duxY+5lnnunydWzdutW+7rrr7L59+9rBYNA+5phj7GnTpsXuf+ONN2xJh32sXr36iI+3fv162+fz2eeee26Xz33A7Nmz7QsuuMAuLCy08/Pz7U9/+tP2u+++2+6YJ5980pZkz5w507799tvt8vJyOy8vz77kkkvsbdu2xY6rqak5rNbx48fH7t+9e7d922232QMHDrQDgYA9dOhQ+95777UjkUjsmNWrV9uS7B//+Mf2o48+ag8ZMsQOBAL2iSeeaL///vux46699tojvjedGT9+vD1mzJgj3hcOh+3Ro0fbeXl59p49e9q9pmuvvTb2fWtrq33XXXfZdXV1djAYtPv06WOfccYZ9muvvdZlXQe/tvvuu88eMmSI7fF47Dlz5sTue/LJJ9u9xvz8fHvlypX2eeedZ+fl5dlVVVX2d7/7XTsajcaOO3CevPHGG+1e06GP2dV7Jsm+88472z1GIs8PAO3Rwgd005e+9CX95je/0auvvqqLLroodvuWLVv0f//3f7rzzjvbHT9jxgw999xzmjp1qoLBoB5++GFdcMEFev/993XUUUdJkrZu3apTTz1VlmXplltuUUVFhf7+979rypQp2rdvX6z17LHHHtPUqVP17//+77rtttvU3NysefPm6b333tMXv/jFDmtuamrShAkTtGLFCt1yyy0aPHiwnn/+eU2aNEl79uzRbbfdplGjRum3v/2tbr/9dg0cOFBf//rXJUkVFRVHfMy///3vCofDXY7xO2DhwoU666yzVFRUpG984xvy+/169NFHNWHCBM2YMUOnnHJKu+NvvfVWlZaW6s4779SaNWt0//3365ZbbtFzzz0nSbr//vt16623qqCgQN/+9rclKdbF3tjYqPHjx2vjxo266aabVF1drXfeeUff+ta3tHnzZt1///3tnmv69Onav3+/brrpJlmWpR/96Ee69NJLtWrVKvn9ft10003atGnTEbv2e8Lr9erKK6/U//zP/2jmzJmaOHHiEY+766679IMf/EDXX3+9Tj75ZO3bt08ffvihZs+erXPPPTeuup588kk1NzfrxhtvVDAYVJ8+fRSNRo94bCQS0QUXXKBTTz1VP/rRj/TKK6/ozjvvVDgc1v/+7/926zV29z1L9PkB4BCmEyeQ7g5t4YtEIvbAgQPtK664ot1xP/vZz2zLsuxVq1bFblNbq8aHH34Yu23t2rV2Tk6O/bnPfS5225QpU+yqqip7x44d7R7zC1/4gl1cXGw3Njbatm3bF198cYetRp25//77bUn2008/HbuttbXVPu200+yCggJ73759sdtramrsiRMndvmYt99+uy3JnjNnTlw1XHLJJXYgELBXrlwZu23Tpk12YWGhPW7cuNhtB1pwzjnnnHYtS7fffrvt9XrbtYiNGTOmXaveAd/73vfs/Px8e9myZe1u/+Y3v2l7vV573bp1tm1/0ipVVlZm79q1K3bcSy+9ZEuy//znP8duO/Q86EpnLXy2bdt//OMfbUn2z3/+89hth7bwHXvssV3+W3RU14HXVlRUdFjLV0ctfJLsW2+9NXZbNBq1J06caAcCAXv79u22bcffwtdZbbZ9eAtfMs4PAJ9gli7QTR6PR1dddZVefvll7d+/P3b7M888o9NPP12DBw9ud/xpp52msWPHxr6vrq7WxRdfrFdffVWRSES2besPf/iDPvvZz8q2be3YsSP2cf7552vv3r2aPXu2JKmkpEQbNmzQBx980K2a//a3v6myslJXXnll7Da/36+pU6eqvr5eM2bM6Pb7sG/fPklSYWFhl8dGIhG99tpruuSSSzRkyJDY7VVVVfriF7+omTNnxh7vgBtvvFGWZcW+P+ussxSJRLR27doun+/555/XWWedpdLS0nbv5znnnKNIJKK33nqr3fFXXHGFSktL2z2XJK1atarL5+qpA0ugHHwOHaqkpEQLFy7U8uXLe/w8l112WYettEdyyy23xL4+0OLc2tqqf/zjHz2uoSupPj+AbETgA3rgmmuuUVNTk/74xz9KkpYuXaqPPvroiN2bw4YNO+y24cOHq7GxUdu3b9f27du1Z88e/epXv1JFRUW7j8mTJ0tyJlJI0n/+53+qoKBAJ598soYNG6abb75Zb7/9dpf1rl27VsOGDZPH0/6//KhRo2L3d1dRUZGkzgPLAdu3b1djY6NGjBhx2H2jRo1SNBrV+vXr291eXV3d7vsDgWz37t1dPt/y5cv1yiuvHPZ+nnPOOZI+eT8T8Vw9dWA2bGeB+X//93+1Z88eDR8+XEcffbTuuOMOzZs3r1vPc+gfIJ3xeDztApfknKuSs3ZfsqT6/ACyEWP4gB4YPXq0xo4dq6efflrXXHONnn76aQUCAV1++eXdfqwD46muvvpqXXvttUc85phjjpHkXPyWLl2qv/zlL3rllVf0hz/8QQ8//LC+853v6Lvf/W7PX1APjBw5UpI0f/58HXfccQl//APLhRzKjmP5kWg0qnPPPVff+MY3jnj/gRCTiOfqqQULFkiS6urqOjxm3LhxWrlypV566SW99tprevzxx3Xffffpl7/8pa6//vq4nic3Nzch9R5wcKvawSKRSEKfpysm/s2ATEbgA3rommuu0de+9jVt3rxZ06dP18SJE9t1Cx5wpO64ZcuWKS8vL9bVVlhYqEgkEmuB6kx+fr6uuOIKXXHFFWptbdWll16qe+65R9/61rc6XOqipqZG8+bNUzQabdfKt2TJktj93XXhhRfK6/Xq6aef7nLiRkVFhfLy8rR06dLD7luyZIk8Ho8GDRrU7Ro6Ch9Dhw5VfX19XO9nb5+rJyKRiKZPn668vDydeeaZnR7bp08fTZ48WZMnT1Z9fb3GjRunu+66Kxb4EllXNBrVqlWr2gXiZcuWSXJ2AZE+aUnbs2dPu589UitxvLUl6/wA8Am6dIEeuvLKK2VZlm677TatWrWqw3X63n333dgYPElav369XnrpJZ133nnyer3yer267LLL9Ic//CHW6nOw7du3x77euXNnu/sCgYBGjx4t27YVCoU6rPUzn/mMtmzZ0m4GYzgc1oMPPqiCggKNHz8+7td9wKBBg3TDDTfotdde04MPPnjY/dFoVD/96U+1YcMGeb1enXfeeXrppZfadQ1u3bpV06dP15lnnhnrIu6O/Pz8w4KHJF1++eV699139eqrrx523549exQOh3v0XAd+vjcikYimTp2qxYsXa+rUqZ2+7kP/vQsKClRXV6eWlpaE13XAQw89FPvatm099NBD8vv9OvvssyU5fxx4vd7DxkE+/PDDhz1WvLUl6/wA8Ala+IAeqqio0AUXXKDnn39eJSUlHS6tcdRRR+n8889vtyyLpHZdsPfee6/eeOMNnXLKKbrhhhs0evRo7dq1S7Nnz9Y//vEP7dq1S5J03nnnqbKyUmeccYb69eunxYsX66GHHtLEiRM7HQt244036tFHH9WkSZP00Ucfqba2Vi+88ILefvtt3X///XFNvDiSn/70p1q5cqWmTp2qF198URdddJFKS0u1bt06Pf/881qyZIm+8IUvSJLuvvtu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\n",
+      "text/plain": [
+       "<Figure size 1000x800 with 1 Axes>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "plt.figure(figsize=(10,8))\n",
+    "plt.pie(type_count,labels=type_count.index,startangle=140, colors=[color[0],color[4]],autopct='%1.1f%%')\n",
+    "plt.title(\"Types of Content Distribution\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e74e27be",
+   "metadata": {
+    "papermill": {
+     "duration": 0.009491,
+     "end_time": "2025-12-27T22:06:00.681809",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.672318",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "### Insights - the netflix libary consist of more movies than tv shows"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e5095ec2",
+   "metadata": {
+    "papermill": {
+     "duration": 0.009359,
+     "end_time": "2025-12-27T22:06:00.700635",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.691276",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "source": [
+    "## How content is been added over time in netflix\n",
+    "- year distribution (type)\n",
+    "- month distribution (type)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "id": "fefe33b3",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:06:00.721133Z",
+     "iopub.status.busy": "2025-12-27T22:06:00.720765Z",
+     "iopub.status.idle": "2025-12-27T22:06:00.743851Z",
+     "shell.execute_reply": "2025-12-27T22:06:00.742962Z"
+    },
+    "papermill": {
+     "duration": 0.035812,
+     "end_time": "2025-12-27T22:06:00.745905",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.710093",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "content_year = df.groupby(['year','type']).size().unstack().fillna(0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "id": "05d125ea",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-12-27T22:06:00.766235Z",
+     "iopub.status.busy": "2025-12-27T22:06:00.765915Z",
+     "iopub.status.idle": "2025-12-27T22:06:00.773862Z",
+     "shell.execute_reply": "2025-12-27T22:06:00.772803Z"
+    },
+    "papermill": {
+     "duration": 0.020278,
+     "end_time": "2025-12-27T22:06:00.775659",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.755381",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "content_month = df.groupby(['month','type']).size().unstack().fillna(0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "70b76c1e",
+   "metadata": {
+    "papermill": {
+     "duration": 0.009444,
+     "end_time": "2025-12-27T22:06:00.794501",
+     "exception": false,
+     "start_time": "2025-12-27T22:06:00.785057",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kaggle": {
+   "accelerator": "none",
+   "dataSources": [
+    {
+     "datasetId": 9128536,
+     "sourceId": 14300188,
+     "sourceType": "datasetVersion"
+    }
+   ],
+   "dockerImageVersionId": 31234,
+   "isGpuEnabled": false,
+   "isInternetEnabled": true,
+   "language": "python",
+   "sourceType": "notebook"
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.12"
+  },
+  "papermill": {
+   "default_parameters": {},
+   "duration": 8.802468,
+   "end_time": "2025-12-27T22:06:01.423715",
+   "environment_variables": {},
+   "exception": null,
+   "input_path": "__notebook__.ipynb",
+   "output_path": "__notebook__.ipynb",
+   "parameters": {},
+   "start_time": "2025-12-27T22:05:52.621247",
+   "version": "2.6.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
