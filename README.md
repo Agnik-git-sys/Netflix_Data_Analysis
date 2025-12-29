@@ -1,4 +1,5 @@
 📊 Netflix Data Analysis
+
 📌 Project Overview
 
 This project performs an exploratory data analysis (EDA) on the Netflix Movies & TV Shows dataset to uncover patterns in content distribution, growth trends, genres, ratings, and geographical reach.
